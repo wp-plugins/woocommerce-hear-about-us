@@ -1,7 +1,7 @@
 <?php
 /*
 Plugin Name: WooCommerce Hear About Us
-Version: 1.0
+Version: 1.0.1
 Plugin URI: http://www.siteoptimo.com/#utm_source=wpadmin&utm_medium=plugin&utm_campaign=wch
 Description: Ask where your new customers come from at checkout.
 Author: SiteOptimo
@@ -39,7 +39,7 @@ if ( in_array( 'woocommerce/woocommerce.php', apply_filters( 'active_plugins', g
 		 * Main WooCommerce_HearAboutUs Class
 		 *
 		 * @class WooCommerce_HearAboutUs
-		 * @version 1.0
+		 * @version 1.0.1
 		 */
 		final class WooCommerce_HearAboutUs {
 			/**
@@ -52,7 +52,7 @@ if ( in_array( 'woocommerce/woocommerce.php', apply_filters( 'active_plugins', g
 			 *
 			 * @var string
 			 */
-			public static $version = "1.0";
+			public static $version = "1.0.1";
 
 
 			/**
@@ -218,6 +218,7 @@ if ( in_array( 'woocommerce/woocommerce.php', apply_filters( 'active_plugins', g
 				new WCHAU_Custom_Field();
 
 				add_action( 'init', array( $this, 'sitewide_init' ) );
+				add_action( 'plugins_loaded', array( $this, 'load_translations' ) );
 			}
 
 			/**
@@ -228,10 +229,13 @@ if ( in_array( 'woocommerce/woocommerce.php', apply_filters( 'active_plugins', g
 					new WCHAU_WPML_Compatibility();
 				}
 			}
+
+			public function load_translations() {
+				load_plugin_textdomain( 'woocommerce-hear-about-us', false, dirname($this->plugin_basename()) . '/i18n/languages/' );
+			}
 		}
 
 		// Our WooCommerce_HearAboutUs instance.
 		$WCHAU = WooCommerce_HearAboutUs::instance();
 	}
-
 }
