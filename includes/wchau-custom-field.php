@@ -15,6 +15,8 @@ class WCHAU_Custom_Field {
 			add_action( 'woocommerce_checkout_update_order_meta', array( $this, 'save_source_to_order_meta' ) );
 		}
 
+		add_filter( 'woocommerce_email_order_meta_keys', array( $this, 'add_field_to_email' ) );
+
 	}
 
 	function display_field( $checkout ) {
@@ -26,7 +28,18 @@ class WCHAU_Custom_Field {
 			'required' => $this->is_field_required(),
 		), $checkout->get_value( 'wchau_source' ) );
 
+        if(wchau_get_option('wchau_other', false)) {
+            $this->enqueue_option_js();
+            echo '<input type="text" name="wchau_source" value="" disabled style="display:none" />';
+        }
+
 	}
+
+    private function enqueue_option_js() {
+        global $WCHAU;
+
+        wp_enqueue_script('wchau_other', $WCHAU->plugin_url() . 'assets/js/other-field.js', array('jquery'), WooCommerce_HearAboutUs::$version, true);
+    }
 
 	public static function prepare_options( $options ) {
 
@@ -39,6 +52,10 @@ class WCHAU_Custom_Field {
 		foreach ( $options as $option ) {
 			$return[ self::slugify( $option ) ] = $option;
 		}
+
+        if(wchau_get_option('wchau_other', false)) {
+            $return['other'] = wchau_get_option('wchau_label_other');
+        }
 
 		return $return;
 	}
@@ -84,6 +101,11 @@ class WCHAU_Custom_Field {
 		return $fields;
 	}
 
+	public function add_field_to_email( $keys ) {
+		$keys[ __( 'Source', 'woocommerce-hear-about-us' ) ] = 'source';
+
+		return $keys;
+	}
 
 	public static function get_options() {
 		return self::prepare_options( wchau_get_option( 'wchau_options' ) );
@@ -96,4 +118,7 @@ class WCHAU_Custom_Field {
 	private function is_field_required() {
 		return get_option( 'wchau_required', 'yes' ) == 'yes';
 	}
+
+
+
 }
